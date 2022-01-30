@@ -4,9 +4,14 @@ provider "aws" {
 resource "aws_instance" "my_aws" {
     ami = "ami-0d527b8c289b4af7f"
     instance_type = "t2.micro"
-    key_name = "terraform"
-    associate_public_ip_address = true
-    vpc_security_group_ids = [aws_security_group.my_ubuntu.id]
+    #key_name = "terraform"
+    #associate_public_ip_address = true
+    #vpc_security_group_ids = [aws_security_group.my_ubuntu.id]
+
+locals {
+   azs = data.aws_availability_zones.available.names
+}
+
 
 data "aws_availability_zones" "available" {}
 
@@ -35,6 +40,7 @@ resource "aws_internet_gateway" "my_internet_gateway" {
     tags = {
        Name = "my_igw-${random_id.random.dec}"
        Owner = "Jana"
+
 }
 }
 
@@ -63,11 +69,11 @@ resource "aws_default_route_table" "my_private_rt" {
 }
 
 resource "aws_subnet" "my_public_subnet" {
-    count = length(var.public_cidrs)
+    count = length(local.azs)
     vpc_id = aws_vpc.my_vpc.id
-    cidr_block = var.public_cidrs[count.index]
+    cidr_block = cidrsubnet(var.vpc_cidr, 8, count.index)
     map_public_ip_on_launch = true
-    availability_zone = data.aws.availability_zones.available.names[count.index]
+    availability_zone = local.azs[count.index]
 
     tags = {
       Name = "my-public-${count.index + 1}"
@@ -76,14 +82,20 @@ resource "aws_subnet" "my_public_subnet" {
 }
 
 resource "aws_subnet" "my_private_subnet" {
-    count = length(var.private_cidrs)
+    count = length(local.azs)
     vpc_id = aws_vpc.my_vpc.id
-    cidr_block = var.private_cidrs[count.index]
+    cidr_block = cidrsubnet(var.vpc_cidr, 8, length(local.azs) + count.index)
     map_private_ip_on_launch = false
-    availability_zone = data.aws.availability_zones.available.names[count.index]
+    availability_zone = local.azs[count.index]
 
     tags = {
       Name = "my-private-${count.index + 1}"
       Owner = "Jana"
 }
+}
+
+resource "aws_route_table_association" "my_public_assoc" {
+     count = length(local.azs)
+     subnet_id = aws_subnet.my_public_subnet.*.id[count.index]
+     route_table_id = aws_route_table.my_public_rt.id
 }
