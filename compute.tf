@@ -1,9 +1,9 @@
 data "aws_ami" "server_ami" {
     most_recent = true
-    owners = [""]
+    owners = ["099720109477"]
     filter {
          name = "name"
-         values = ["-*"]
+         values = ["ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-20211129-*"]
 
 }
 }
