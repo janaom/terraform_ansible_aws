@@ -3,7 +3,7 @@ data "aws_ami" "server_ami" {
     owners = ["099720109477"] #to know the Owner ID, run: sudo apt install awscli; then aws configure; then aws ec2 describe-images --image-ids ami-0d527b8c289b4af7f --region eu-central-1
     filter {
          name = "name"
-         values = ["ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-20211129-*"]
+         values = ["ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-20211129-*"] #to find the name, check the comment on 'owners'
 
 }
 }
