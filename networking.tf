@@ -1,13 +1,3 @@
-provider "aws" {
-    region = "eu-central-1" #us west oregon: us-west-2
-}
-resource "aws_instance" "my_aws" {
-    ami = "ami-0d527b8c289b4af7f"
-    instance_type = "t2.micro"
-    #key_name = "terraform"
-    #associate_public_ip_address = true
-    #vpc_security_group_ids = [aws_security_group.my_ubuntu.id]
-
 locals {
    azs = data.aws_availability_zones.available.names
 }
@@ -122,5 +112,4 @@ resource "aws_security_group_rule" "egress_all" {
       protocol = "-1"
       cidr_blocks = ["0.0.0.0/0"]
       security_group_id = aws_security_group.my_sg.id
-}    
-    
+}
