@@ -1,5 +1,5 @@
 ---
-- name: Install Grafana
+- name: Remove Grafana
   hosts: hosts
   become: yes
 
