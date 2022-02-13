@@ -20,3 +20,6 @@ ansible_python_interpreter=/usr/bin/python3"
 
 
 sudo vi /etc/ansible/ansible.cfg -> to add "host_key_checking = False"
+
+
+sudo systemctl status grafana -> to check if grafana was removed
