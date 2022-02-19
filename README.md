@@ -27,3 +27,5 @@ sudo systemctl status grafana -> to check if grafana was removed
 aws ec2 wait instance-status-ok --instance-ids i-[AMI] --region [region]
 
 ansible-playbook -i aws_hosts --private-key /home/jana/.ssh/id_rsa playbooks/main.playbook.yml
+
+openssl pkcs8 -topk8 -inform PEM -outform PEM -in xxx.pem -out converted-github-app.pem -norcypt  -> jenkins will understand
