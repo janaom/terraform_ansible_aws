@@ -25,3 +25,5 @@ sudo vi /etc/ansible/ansible.cfg -> to add "host_key_checking = False"
 sudo systemctl status grafana -> to check if grafana was removed
 
 aws ec2 wait instance-status-ok --instance-ids i-[AMI] --region [region]
+
+ansible-playbook -i aws_hosts --private-key /home/jana/.ssh/id_rsa playbooks/main.playbook.yml
