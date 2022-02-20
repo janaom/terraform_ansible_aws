@@ -23,7 +23,7 @@ resource "aws_instance" "my_main" {
     key_name = aws_key_pair.my_auth.id
     vpc_security_group_ids = [aws_security_group.my_sg.id]
     subnet_id = aws_subnet.my_public_subnet[count.index].id
-    user_data = templatefile("./main-userdata.tpl", {new_hostname = "my-main-${random_id.my_node_id[count.index].dec}"})
+   #user_data = templatefile("./main-userdata.tpl", {new_hostname = "my-main-${random_id.my_node_id[count.index].dec}"})
     root_block_device {
           volume_size = var.main_vol_size
 
@@ -35,7 +35,7 @@ resource "aws_instance" "my_main" {
 }
 
     provisioner "local-exec" {
-         command = "printf '\n${self.public_ip}' >> aws_hosts"
+         command = "printf '\n${self.public_ip}' >> aws_hosts && aws ec2 wait instance-status-ok --instance-ids ${self.id} --region eu-central-1"
 }
     provisioner "local-exec" {
         when = destroy
@@ -43,16 +43,31 @@ resource "aws_instance" "my_main" {
 }
 }
 
-resource "null_resource" "grafana_update" {
-        count = var.main_instance_count
-        provisioner "remote-exec" {
-            inline = ["sudo apt upgrade -y grafana && touch upgrade.log && echo 'I updated Grafana' >> upgrade.log"]
+#resource "null_resource" "grafana_update" {
+#        count = var.main_instance_count
+#       provisioner "remote-exec" {
+#           inline = ["sudo apt upgrade -y grafana && touch upgrade.log && echo 'I updated Grafana' >> upgrade.log"]
 
-        connection {
-            type = "ssh"
-            user = "ubuntu"
-            private_key = file("./terraform.pem")
-            host = aws_instance.my_main[count.index].public_ip
+#        connection {
+#           type = "ssh"
+#           user = "ubuntu"
+#           private_key = file("./terraform.pem")
+#           host = aws_instance.my_main[count.index].public_ip
+#}
+#}
+#}
+
+resource "null_resource" "grafana_install" {
+       depends_on = [aws_instance.my_main]
+       providioner "local-exec" {
+         command = "ansible-playbook -i aws_hosts --key-file /home/jana/.ssh/id_rsa playbooks/grafana.yml"
 }
 }
+
+output "grafana_access" {
+     value = {for i in aws_instance.my_main[*] : i.tags.Name => "${i.public_ip}:3000"}
+}
+
+output "grafana_ips" {
+     value = [for i in aws_instance.my_main[*]: i.public_ip]
 }
