@@ -68,6 +68,10 @@ output "grafana_access" {
      value = {for i in aws_instance.my_main[*] : i.tags.Name => "${i.public_ip}:3000"}
 }
 
-output "grafana_ips" {
+output "instance_ips" {
      value = [for i in aws_instance.my_main[*]: i.public_ip]
+}
+
+output "instance_ids" {
+     value = [for i in aws_instance.my_main[*]: i.id}
 }
