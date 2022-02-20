@@ -19,6 +19,12 @@ pipeline {
         sh 'terraform init -no-color'
 }
 }
+    stage('Validate Aplly') {
+      input {
+        message "Do you want to apply this plan?"
+        ok "Aplly this plan."
+}
+}
     stage('Apply') {
       steps {
         sh 'terraform apply -auto-approve -no-color'
